@@ -39,7 +39,7 @@ struct Args {
     #[arg(short, long, default_value = "60")]
     duration: u16,
 
-    /// Meeting password (max. 10 characters)
+    /// Meeting password, max. 10 characters [default: auto-generated random password]
     #[arg(short, long)]
     password: Option<String>,
 

@@ -35,7 +35,7 @@ Options:
   -o, --on <DATE>            Date of the meeting in YYYY-MM-DD format or one of: today, tomorrow, monday, tuesday, wednesday, thursday, friday, saturday, sunday
   -a, --at <TIME>            Time of the meeting in HH:MM format
   -d, --duration <DURATION>  Duration of the meeting in minutes [default: 60]
-  -p, --password <PASSWORD>  Meeting password (max. 10 characters)
+  -p, --password <PASSWORD>  Meeting password, max. 10 characters [default: auto-generated random password]
   -t, --timezone <TIMEZONE>  Timezone (as in https://marketplace.zoom.us/docs/api-reference/other-references/abbreviation-lists/#timezones) for the meeting, e.g. America/Recife [default: your account's timezone]
   -h, --help                 Print help information
 ```
