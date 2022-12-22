@@ -12,13 +12,13 @@ struct Args {
     #[arg(short, long)]
     name: String,
 
-    /// Meeting password
+    /// Meeting password (max. 10 characters)
     #[arg(short, long)]
-    password: String,
+    password: Option<String>,
 
-    /// Timezone (as in the TZ database) for the meeting, e.g. America/Recife (see https://marketplace.zoom.us/docs/api-reference/other-references/abbreviation-lists/#timezones)
-    #[arg(short, long, default_value = "UTC")]
-    timezone: String,
+    /// Timezone (as in https://marketplace.zoom.us/docs/api-reference/other-references/abbreviation-lists/#timezones) for the meeting, e.g. America/Recife [default: your account's timezone]
+    #[arg(short, long)]
+    timezone: Option<String>,
 
     /// Duration of the meeting in minutes
     #[arg(short, long, default_value = "60")]

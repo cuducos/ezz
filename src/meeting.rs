@@ -1,9 +1,26 @@
+use rand::Rng;
 use reqwest::blocking::Client;
 use serde::Serialize;
 
 use crate::responses::{assert_ok, MeetingResponse};
 
 const MEETING_URL: &str = "https://api.zoom.us/v2/users/me/meetings";
+
+fn random_password() -> String {
+    let mut rng = rand::thread_rng();
+    (0..6)
+        .map(|_| rng.gen_range(0..=9))
+        .map(|n| format!("{}", n))
+        .collect::<Vec<String>>()
+        .join("")
+}
+
+#[test]
+fn test_random_password() {
+    let password = random_password();
+    assert_eq!(password.len(), 6);
+    assert!(password.chars().all(|c| c.is_numeric()));
+}
 
 #[derive(Serialize)]
 struct Settings {
@@ -16,7 +33,7 @@ struct Settings {
 pub struct Meeting {
     topic: String,
     password: String,
-    timezone: String,
+    timezone: Option<String>,
     start_time: String,
     duration: u16,
     settings: Settings,
@@ -25,15 +42,15 @@ pub struct Meeting {
 impl Meeting {
     pub fn new(
         topic: String,
-        password: String,
-        timezone: String,
+        password: Option<String>,
+        timezone: Option<String>,
         date: String,
         time: String,
         duration: u16,
     ) -> Meeting {
         Meeting {
             topic,
-            password,
+            password: password.unwrap_or_else(random_password),
             timezone,
             start_time: format!("{}T{}:00", date, time),
             duration,
