@@ -1,8 +1,9 @@
 use clap::Parser;
 
+mod date;
 mod meeting;
-mod settings;
 mod responses;
+mod settings;
 
 #[derive(Parser, Default)]
 #[command(about = "ezz is a simple CLI tool to schedule meetings on Zoom.")]
@@ -23,8 +24,16 @@ struct Args {
     #[arg(short, long, default_value = "60")]
     duration: u8,
 
-    /// Date of the meeting in YYYY-MM-DD format
-    #[arg(short = 'w', long)]
+    #[arg(
+        short = 'w',
+        long,
+        value_parser = date::parse_date,
+        help = format!(
+            "Date of the meeting in {} format or one of: {}",
+            date::HUMAN_FORMAT,
+            date::VALID_DATE_ALIASES.join(", "),
+        ),
+    )]
     date: String,
 
     /// Time of the meeting in HH:MM format

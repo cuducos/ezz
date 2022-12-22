@@ -1,5 +1,5 @@
-use reqwest::blocking::Client;
 use std::env;
+use reqwest::blocking::Client;
 
 use crate::responses::{assert_ok, TokenResponse};
 
