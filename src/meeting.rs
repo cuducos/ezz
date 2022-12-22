@@ -5,21 +5,25 @@ use serde::Serialize;
 use crate::responses::{assert_ok, MeetingResponse};
 
 const MEETING_URL: &str = "https://api.zoom.us/v2/users/me/meetings";
+const PASSWORD_CHARS: &str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789*-_@";
 
 fn random_password() -> String {
     let mut rng = rand::thread_rng();
-    (0..6)
-        .map(|_| rng.gen_range(0..=9))
-        .map(|n| format!("{}", n))
-        .collect::<Vec<String>>()
-        .join("")
+    let size = rng.gen_range(6..=10);
+    (0..size)
+        .map(|_| rng.gen_range(0..PASSWORD_CHARS.len()))
+        .map(|n| PASSWORD_CHARS.chars().nth(n).unwrap())
+        .collect::<String>()
 }
 
 #[test]
 fn test_random_password() {
-    let password = random_password();
-    assert_eq!(password.len(), 6);
-    assert!(password.chars().all(|c| c.is_numeric()));
+        let password = random_password();
+        assert!(password.len() <= 10);
+        assert!(password.len() >= 6);
+        for char in password.chars() {
+            assert!(PASSWORD_CHARS.contains(char));
+        }
 }
 
 #[derive(Serialize)]
