@@ -4,6 +4,7 @@ mod date;
 mod meeting;
 mod responses;
 mod settings;
+mod time;
 
 #[derive(Parser, Default)]
 #[command(about = "ezz is a simple CLI tool to schedule Zoom meetings.")]
@@ -34,11 +35,10 @@ struct Args {
             date::ALIASES.join(", "),
         ),
     )]
-    date: String,
+    when: String,
 
-    /// Time of the meeting in HH:MM format
-    #[arg(short = 'a', long)]
-    time: String,
+    #[arg(short , long, value_parser = time::parse_time, help= format!("Time of the meeting in {} format", time::HUMAN_FORMAT))]
+    at: String,
 }
 
 fn main() {
@@ -49,8 +49,8 @@ fn main() {
         args.name,
         args.password,
         args.timezone,
-        args.date,
-        args.time,
+        args.when,
+        args.at,
         args.duration,
     );
     println!("{}", meeting.save(token));
