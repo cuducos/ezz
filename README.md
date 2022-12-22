@@ -28,14 +28,14 @@ See all the options:
 $ ezz --help
 ezz is a simple CLI tool to schedule Zoom meetings.
 
-Usage: ezz [OPTIONS] --name <NAME> --when <WHEN> --at <AT>
+Usage: ezz [OPTIONS] --name <NAME> --on <ON> --at <AT>
 
 Options:
   -n, --name <NAME>          Name of the meeting
   -p, --password <PASSWORD>  Meeting password (max. 10 characters)
   -t, --timezone <TIMEZONE>  Timezone (as in https://marketplace.zoom.us/docs/api-reference/other-references/abbreviation-lists/#timezones) for the meeting, e.g. America/Recife [default: your account's timezone]
   -d, --duration <DURATION>  Duration of the meeting in minutes [default: 60]
-  -w, --when <WHEN>          Date of the meeting in YYYY-MM-DD format or one of: today, tomorrow, monday, tuesday, wednesday, thursday, friday, saturday, sunday
+  -o, --on <ON>              Date of the meeting in YYYY-MM-DD format or one of: today, tomorrow, monday, tuesday, wednesday, thursday, friday, saturday, sunday
   -a, --at <AT>              Time of the meeting in HH:MM format
   -h, --help                 Print help information
 ```
@@ -45,6 +45,6 @@ Options:
 Creating a Zoom meeting called _Aloha_ for next Friday at 5 pm:
 
 ```console
-$ ezz --name Aloha --when friday --at 17:00
+$ ezz --name Aloha --on friday --at 17:00
 https://us02web.zoom.us/j/00000000000?pwd=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```

@@ -26,7 +26,7 @@ struct Args {
     duration: u16,
 
     #[arg(
-        short = 'w',
+        short,
         long,
         value_parser = date::parse_date,
         help = format!(
@@ -35,7 +35,7 @@ struct Args {
             date::ALIASES.join(", "),
         ),
     )]
-    when: String,
+    on: String,
 
     #[arg(short , long, value_parser = time::parse_time, help= format!("Time of the meeting in {} format", time::HUMAN_FORMAT))]
     at: String,
@@ -49,7 +49,7 @@ fn main() {
         args.name,
         args.password,
         args.timezone,
-        args.when,
+        args.on,
         args.at,
         args.duration,
     );
