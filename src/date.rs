@@ -1,10 +1,10 @@
 use chrono::Weekday::{Fri, Mon, Sat, Sun, Thu, Tue, Wed};
-use chrono::{Datelike, Duration, Local, NaiveDate};
+use chrono::{Datelike, Duration, Local, NaiveDate, Weekday};
 use std::io::{Error, ErrorKind};
 
 const FORMAT: &str = "%Y-%m-%d";
 pub const HUMAN_FORMAT: &str = "YYYY-MM-DD";
-pub const VALID_DATE_ALIASES: [&str; 9] = [
+pub const ALIASES: [&str; 9] = [
     "today",
     "tomorrow",
     "monday",
@@ -25,23 +25,29 @@ fn alias_to_date(alias: &str) -> Option<NaiveDate> {
     }
 }
 
-fn weekday_to_date(name: &str) -> Option<NaiveDate> {
-    let target = match name {
-        "monday" => Mon,
-        "tuesday" => Tue,
-        "wednesday" => Wed,
-        "thursday" => Thu,
-        "friday" => Fri,
-        "saturday" => Sat,
-        "sunday" => Sun,
-        _ => return None,
-    };
-
+fn weekday_to_date(weekday: Weekday) -> Option<NaiveDate> {
     let mut date = Local::now().naive_local().date();
-    while date.weekday() != target {
+    while date.weekday() != weekday {
         date += Duration::days(1);
     }
     Some(date)
+}
+
+struct Parser(Option<Weekday>);
+
+impl Parser {
+    fn for_alias() -> Parser {
+        Parser(None)
+    }
+    fn for_weekday(weekday: Weekday) -> Parser {
+        Parser(Some(weekday))
+    }
+    fn parse(&self, value: &str) -> Option<NaiveDate> {
+        match self.0 {
+            Some(weekday) => weekday_to_date(weekday),
+            None => alias_to_date(value),
+        }
+    }
 }
 
 fn date_from_str(value: &str) -> Result<NaiveDate, std::io::Error> {
@@ -49,23 +55,34 @@ fn date_from_str(value: &str) -> Result<NaiveDate, std::io::Error> {
     if let Ok(date) = NaiveDate::parse_from_str(&val, FORMAT) {
         return Ok(date);
     }
-    if let Some(date) = alias_to_date(&val) {
-        println!("{:?}", date); // TODO: remove
-        return Ok(date);
-    }
-    if let Some(date) = weekday_to_date(&val) {
-        return Ok(date);
-    }
 
-    Err(Error::new(
-        ErrorKind::Other,
-        format!(
-            "Invalid date: {}. Available values are dates in the {} format or one of {}",
-            value,
-            HUMAN_FORMAT,
-            VALID_DATE_ALIASES.join(", ")
-        ),
-    ))
+    let parsers: [Parser; 9] = [
+        Parser::for_alias(),
+        Parser::for_alias(),
+        Parser::for_weekday(Mon),
+        Parser::for_weekday(Tue),
+        Parser::for_weekday(Wed),
+        Parser::for_weekday(Thu),
+        Parser::for_weekday(Fri),
+        Parser::for_weekday(Sat),
+        Parser::for_weekday(Sun),
+    ];
+
+    ALIASES
+        .iter()
+        .position(|&idx| idx == val)
+        .map(|idx| &parsers[idx])
+        .and_then(|parser| parser.parse(&val))
+        .ok_or_else(|| {
+            Error::new(
+                ErrorKind::InvalidInput,
+                format!(
+                    "Invalid date format. Use {} or one of: {}",
+                    HUMAN_FORMAT,
+                    ALIASES.join(", ")
+                ),
+            )
+        })
 }
 
 pub fn parse_date(value: &str) -> Result<String, std::io::Error> {

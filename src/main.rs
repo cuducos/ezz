@@ -31,7 +31,7 @@ struct Args {
         help = format!(
             "Date of the meeting in {} format or one of: {}",
             date::HUMAN_FORMAT,
-            date::VALID_DATE_ALIASES.join(", "),
+            date::ALIASES.join(", "),
         ),
     )]
     date: String,
