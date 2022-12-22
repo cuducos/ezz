@@ -6,7 +6,7 @@ mod responses;
 mod settings;
 
 #[derive(Parser, Default)]
-#[command(about = "ezz is a simple CLI tool to schedule meetings on Zoom.")]
+#[command(about = "ezz is a simple CLI tool to schedule Zoom meetings.")]
 struct Args {
     /// Name of the meeting
     #[arg(short, long)]

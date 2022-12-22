@@ -1,6 +1,6 @@
 # `ezz` [![Tests](https://github.com/cuducos/ezz/actions/workflows/tests.yml/badge.svg)](https://github.com/cuducos/ezz/actions/workflows/tests.yml)
 
-`ezz` (cheesy abbreviation for _easy Zoom_) is a simple CLI tool to schedule meetings on [Zoom](https://zoom.us):
+`ezz` (cheesy abbreviation for _easy Zoom_) is a simple CLI tool to schedule [Zoom](https://zoom.us) meetings.
 
 ## Install
 
@@ -24,9 +24,9 @@ You can obtain yours in [Zoom's marketplace](https://marketplace.zoom.us/), unde
 
 See all the options:
 
-```
+```console
 $ ezz --help
-ezz is a simple CLI tool to schedule meetings on Zoom.
+ezz is a simple CLI tool to schedule Zoom meetings.
 
 Usage: ezz [OPTIONS] --name <NAME> --password <PASSWORD> --date <DATE> --time <TIME>
 
@@ -46,7 +46,7 @@ Note that the **default timezone is UTC** and the default duration is 1h.
 
 Creating a Zoom meeting called _Aloha_ for next Friday, 5 pm, with password `12345678`:
 
-```
+```console
 $ ezz --name Aloha --password 12345678 --date friday --time 17:00
 https://us02web.zoom.us/j/00000000000?pwd=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 ```
