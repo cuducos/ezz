@@ -33,7 +33,7 @@ Usage: ezz [OPTIONS] --name <NAME> --password <PASSWORD> --date <DATE> --time <T
 Options:
   -n, --name <NAME>          Name of the meeting
   -p, --password <PASSWORD>  Meeting password
-  -t, --timezone <TIMEZONE>  Timezone (as in the TZ database) for the meeting, e.g. America/Recife (see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) [default: Etc/UTC]
+  -t, --timezone <TIMEZONE>  Timezone (as in the TZ database) for the meeting, e.g. America/Sao_Paulo (see https://marketplace.zoom.us/docs/api-reference/other-references/abbreviation-lists/#timezones) [default: UTC]
   -d, --duration <DURATION>  Duration of the meeting in minutes [default: 60]
   -w, --date <DATE>          Date of the meeting in YYYY-MM-DD format or one of: today, tomorrow, monday, tuesday, wednesday, thursday, friday, saturday, sunday
   -a, --time <TIME>          Time of the meeting in HH:MM format

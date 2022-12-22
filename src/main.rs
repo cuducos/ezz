@@ -16,8 +16,8 @@ struct Args {
     #[arg(short, long)]
     password: String,
 
-    /// Timezone (as in the TZ database) for the meeting, e.g. America/Recife (see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones)
-    #[arg(short, long, default_value = "Etc/UTC")]
+    /// Timezone (as in the TZ database) for the meeting, e.g. America/Recife (see https://marketplace.zoom.us/docs/api-reference/other-references/abbreviation-lists/#timezones)
+    #[arg(short, long, default_value = "UTC")]
     timezone: String,
 
     /// Duration of the meeting in minutes
