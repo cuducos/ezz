@@ -28,6 +28,7 @@ struct Args {
     #[arg(
         short,
         long,
+        name = "DATE",
         value_parser = date::parse_date,
         help = format!(
             "Date of the meeting in {} format or one of: {}",
@@ -37,7 +38,13 @@ struct Args {
     )]
     on: String,
 
-    #[arg(short , long, value_parser = time::parse_time, help= format!("Time of the meeting in {} format", time::HUMAN_FORMAT))]
+    #[arg(
+        short,
+        long,
+        name = "TIME",
+        value_parser = time::parse_time,
+        help= format!("Time of the meeting in {} format", time::HUMAN_FORMAT),
+    )]
     at: String,
 }
 
