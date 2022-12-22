@@ -1,3 +1,4 @@
+use chrono::NaiveTime;
 use regex::Regex;
 use std::io::{Error, ErrorKind};
 
@@ -9,6 +10,11 @@ fn error(value: &str) -> Error {
         ErrorKind::InvalidInput,
         format!("Invalid time format: {}. Use {}", value, HUMAN_FORMAT,),
     )
+}
+
+fn is_valid(value: &str) -> bool {
+    let with_seconds = [value, ":00"].join("");
+    NaiveTime::parse_from_str(&with_seconds, "%H:%M:%S").is_ok()
 }
 
 pub fn parse_time(value: &str) -> Result<String, std::io::Error> {
@@ -29,7 +35,11 @@ pub fn parse_time(value: &str) -> Result<String, std::io::Error> {
         Some(minute) => minute.as_str(),
         None => "00",
     };
-    Ok(format!("{:0>2}:{:0>2}", hour, minute))
+    let formatted = format!("{:0>2}:{:0>2}", hour, minute);
+    if !is_valid(&formatted) {
+        return Err(error(value));
+    }
+    Ok(formatted)
 }
 
 #[test]
@@ -49,5 +59,7 @@ fn test_parse_time() {
     assert_eq!(parse_time("08H").unwrap(), "08:00");
     assert_eq!(parse_time("8H").unwrap(), "08:00");
     assert_eq!(parse_time("16H").unwrap(), "16:00");
+    assert!(parse_time("24h00").is_err());
+    assert!(parse_time("0:60").is_err());
     assert!(parse_time("ezz").is_err());
 }
