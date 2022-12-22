@@ -13,18 +13,6 @@ struct Args {
     #[arg(short, long)]
     name: String,
 
-    /// Meeting password (max. 10 characters)
-    #[arg(short, long)]
-    password: Option<String>,
-
-    /// Timezone (as in https://marketplace.zoom.us/docs/api-reference/other-references/abbreviation-lists/#timezones) for the meeting, e.g. America/Recife [default: your account's timezone]
-    #[arg(short, long)]
-    timezone: Option<String>,
-
-    /// Duration of the meeting in minutes
-    #[arg(short, long, default_value = "60")]
-    duration: u16,
-
     #[arg(
         short,
         long,
@@ -46,6 +34,18 @@ struct Args {
         help= format!("Time of the meeting in {} format", time::HUMAN_FORMAT),
     )]
     at: String,
+
+    /// Duration of the meeting in minutes
+    #[arg(short, long, default_value = "60")]
+    duration: u16,
+
+    /// Meeting password (max. 10 characters)
+    #[arg(short, long)]
+    password: Option<String>,
+
+    /// Timezone (as in https://marketplace.zoom.us/docs/api-reference/other-references/abbreviation-lists/#timezones) for the meeting, e.g. America/Recife [default: your account's timezone]
+    #[arg(short, long)]
+    timezone: Option<String>,
 }
 
 fn main() {
