@@ -22,7 +22,7 @@ struct Args {
 
     /// Duration of the meeting in minutes
     #[arg(short, long, default_value = "60")]
-    duration: u8,
+    duration: u16,
 
     #[arg(
         short = 'w',

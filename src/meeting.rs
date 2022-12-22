@@ -18,7 +18,7 @@ pub struct Meeting {
     password: String,
     timezone: String,
     start_time: String,
-    duration: u8,
+    duration: u16,
     settings: Settings,
 }
 
@@ -29,7 +29,7 @@ impl Meeting {
         timezone: String,
         date: String,
         time: String,
-        duration: u8,
+        duration: u16,
     ) -> Meeting {
         Meeting {
             topic,
