@@ -10,6 +10,16 @@ With [`cargo`](https://www.rust-lang.org/) installed:
 $ cargo install --path .
 ```
 
+## Authentication
+
+`ezz` requires three environment variables to authenticate using your Zoom account:
+
+* `ZOOM_ACCOUNT_ID`
+* `ZOOM_CLIENT_ID`
+* `ZOOM_CLIENT_SECRET`
+
+You can obtain yours in [Zoom's marketplace](https://marketplace.zoom.us/), under _Develop_.
+
 ## Usage
 
 See all the options:
