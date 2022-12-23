@@ -7,8 +7,9 @@ fn parse_date(value: &str) -> Result<String, std::io::Error> {
     date::parse(Local::now().naive_local().date(), value)
 }
 
+/// ezz is a simple CLI tool to schedule Zoom meetings.
 #[derive(Parser, Default)]
-#[command(about = "ezz is a simple CLI tool to schedule Zoom meetings.")]
+#[command()]
 struct Args {
     /// Name of the meeting
     #[arg(short, long)]
