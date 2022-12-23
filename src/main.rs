@@ -1,6 +1,6 @@
 use chrono::Local;
 use clap::Parser;
-use ezz::client::Zoom;
+use ezz::client::{ClientError, Zoom};
 use ezz::{date, time, Meeting};
 
 fn parse_date(value: &str) -> Result<String, std::io::Error> {
@@ -49,7 +49,7 @@ struct Args {
     timezone: Option<String>,
 }
 
-fn main() {
+fn main() -> Result<(), ClientError> {
     let args = Args::parse();
     let meeting = Meeting::new(
         args.name,
@@ -59,18 +59,7 @@ fn main() {
         args.at,
         args.duration,
     );
-    let client = match Zoom::new() {
-        Ok(client) => client,
-        Err(e) => {
-            eprintln!("Error: {}", e);
-            std::process::exit(1);
-        }
-    };
-    match client.save(&meeting) {
-        Ok(url) => println!("{}", url),
-        Err(e) => {
-            eprintln!("Error: {}", e.message);
-            std::process::exit(1);
-        }
-    }
+    let meeting_url = Zoom::new().and_then(|client| client.save(&meeting))?;
+    println!("{}", meeting_url);
+    Ok(())
 }
