@@ -1,10 +1,11 @@
+use chrono::Local;
 use clap::Parser;
+use ezz::client::Zoom;
+use ezz::{date, time, Meeting};
 
-mod date;
-mod meeting;
-mod responses;
-mod settings;
-mod time;
+fn parse_date(value: &str) -> Result<String, std::io::Error> {
+    date::parse(Local::now().naive_local().date(), value)
+}
 
 #[derive(Parser, Default)]
 #[command(about = "ezz is a simple CLI tool to schedule Zoom meetings.")]
@@ -17,7 +18,7 @@ struct Args {
         short,
         long,
         name = "DATE",
-        value_parser = date::parse_date,
+        value_parser = parse_date,
         help = format!(
             "Date of the meeting in {} format or one of: {}",
             date::HUMAN_FORMAT,
@@ -30,7 +31,7 @@ struct Args {
         short,
         long,
         name = "TIME",
-        value_parser = time::parse_time,
+        value_parser = time::parse,
         help= format!("Time of the meeting in {} format", time::HUMAN_FORMAT),
     )]
     at: String,
@@ -50,9 +51,7 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    let settings = settings::Settings::from_env();
-    let token = settings.get_token();
-    let meeting = meeting::Meeting::new(
+    let meeting = Meeting::new(
         args.name,
         args.password,
         args.timezone,
@@ -60,5 +59,18 @@ fn main() {
         args.at,
         args.duration,
     );
-    println!("{}", meeting.save(token));
+    let client = match Zoom::new() {
+        Ok(client) => client,
+        Err(e) => {
+            eprintln!("Error: {}", e);
+            std::process::exit(1);
+        }
+    };
+    match client.save(&meeting) {
+        Ok(url) => println!("{}", url),
+        Err(e) => {
+            eprintln!("Error: {}", e.message);
+            std::process::exit(1);
+        }
+    }
 }

@@ -16,103 +16,112 @@ pub const ALIASES: [&str; 9] = [
     "sunday",
 ];
 
-#[cfg(not(test))]
-mod today {
-    use chrono::{Local, NaiveDate};
-
-    pub fn today() -> NaiveDate {
-        Local::now().naive_local().date()
-    }
+struct Parser {
+    base: NaiveDate,
+    target: Option<Weekday>,
 }
-
-#[cfg(not(test))]
-use today::today;
-
-#[cfg(test)]
-mod mock_today {
-    use chrono::NaiveDate;
-
-    pub fn today() -> NaiveDate {
-        NaiveDate::from_ymd_opt(2022, 12, 28).unwrap()
-    }
-}
-
-#[cfg(test)]
-use mock_today::today;
-
-fn alias_to_date(alias: &str) -> Option<NaiveDate> {
-    match alias {
-        "today" => Some(today()),
-        "tomorrow" => Some(today() + Duration::days(1)),
-        _ => None,
-    }
-}
-
-#[test]
-fn test_alias_to_date() {
-    assert_eq!(
-        alias_to_date("today"),
-        NaiveDate::from_ymd_opt(2022, 12, 28),
-    );
-    assert_eq!(
-        alias_to_date("tomorrow"),
-        NaiveDate::from_ymd_opt(2022, 12, 29),
-    );
-    assert!(alias_to_date("ezz").is_none());
-}
-
-fn weekday_to_date(weekday: Weekday) -> Option<NaiveDate> {
-    let mut date = today();
-    while date.weekday() != weekday {
-        date += Duration::days(1);
-    }
-    Some(date)
-}
-
-#[test]
-fn test_weekday_to_date() {
-    assert_eq!(weekday_to_date(Mon), NaiveDate::from_ymd_opt(2023, 1, 2));
-    assert_eq!(weekday_to_date(Tue), NaiveDate::from_ymd_opt(2023, 1, 3));
-    assert_eq!(weekday_to_date(Wed), NaiveDate::from_ymd_opt(2022, 12, 28));
-    assert_eq!(weekday_to_date(Thu), NaiveDate::from_ymd_opt(2022, 12, 29));
-    assert_eq!(weekday_to_date(Fri), NaiveDate::from_ymd_opt(2022, 12, 30));
-    assert_eq!(weekday_to_date(Sat), NaiveDate::from_ymd_opt(2022, 12, 31));
-    assert_eq!(weekday_to_date(Sun), NaiveDate::from_ymd_opt(2023, 1, 1));
-}
-
-struct Parser(Option<Weekday>);
 
 impl Parser {
-    fn for_alias() -> Parser {
-        Parser(None)
+    fn for_alias(base: NaiveDate) -> Self {
+        Self { base, target: None }
     }
-    fn for_weekday(weekday: Weekday) -> Parser {
-        Parser(Some(weekday))
+
+    fn for_weekday(base: NaiveDate, target: Weekday) -> Self {
+        Self {
+            base,
+            target: Some(target),
+        }
     }
-    fn parse(&self, value: &str) -> Option<NaiveDate> {
-        match self.0 {
-            Some(weekday) => weekday_to_date(weekday),
-            None => alias_to_date(value),
+
+    fn alias(&self, name: &str) -> Option<NaiveDate> {
+        match name {
+            "today" => Some(self.base),
+            "tomorrow" => Some(self.base + Duration::days(1)),
+            _ => None,
+        }
+    }
+
+    fn weekday(&self) -> Option<NaiveDate> {
+        let mut date = self.base;
+        while date.weekday() != self.target? {
+            date += Duration::days(1);
+        }
+        Some(date)
+    }
+
+    fn parse(&self, name: &str) -> Option<NaiveDate> {
+        match self.target {
+            Some(_) => self.weekday(),
+            None => self.alias(name),
         }
     }
 }
 
-fn date_from_str(value: &str) -> Result<NaiveDate, std::io::Error> {
+#[test]
+fn test_parser_alias() {
+    let today = NaiveDate::from_ymd_opt(2022, 12, 28).unwrap();
+    let parser = Parser::for_alias(today);
+    assert!(parser.alias("ezz").is_none());
+    assert_eq!(parser.alias("today"), NaiveDate::from_ymd_opt(2022, 12, 28),);
+    assert_eq!(
+        parser.alias("tomorrow"),
+        NaiveDate::from_ymd_opt(2022, 12, 29),
+    );
+}
+
+#[test]
+fn test_parser_weekday() {
+    let today = NaiveDate::from_ymd_opt(2022, 12, 28).unwrap();
+    assert_eq!(
+        Parser::for_weekday(today, Mon).weekday(),
+        NaiveDate::from_ymd_opt(2023, 1, 2)
+    );
+    assert_eq!(
+        Parser::for_weekday(today, Tue).weekday(),
+        NaiveDate::from_ymd_opt(2023, 1, 3)
+    );
+    assert_eq!(
+        Parser::for_weekday(today, Wed).weekday(),
+        NaiveDate::from_ymd_opt(2022, 12, 28)
+    );
+    assert_eq!(
+        Parser::for_weekday(today, Thu).weekday(),
+        NaiveDate::from_ymd_opt(2022, 12, 29)
+    );
+    assert_eq!(
+        Parser::for_weekday(today, Fri).weekday(),
+        NaiveDate::from_ymd_opt(2022, 12, 30)
+    );
+    assert_eq!(
+        Parser::for_weekday(today, Sat).weekday(),
+        NaiveDate::from_ymd_opt(2022, 12, 31)
+    );
+    assert_eq!(
+        Parser::for_weekday(today, Sun).weekday(),
+        NaiveDate::from_ymd_opt(2023, 1, 1)
+    );
+}
+
+fn to_string(date: NaiveDate) -> String {
+    date.format(FORMAT).to_string()
+}
+
+pub fn parse(today: NaiveDate, value: &str) -> Result<String, std::io::Error> {
     let val = value.to_lowercase();
     if let Ok(date) = NaiveDate::parse_from_str(&val, FORMAT) {
-        return Ok(date);
+        return Ok(to_string(date));
     }
 
     let parsers: [Parser; 9] = [
-        Parser::for_alias(),
-        Parser::for_alias(),
-        Parser::for_weekday(Mon),
-        Parser::for_weekday(Tue),
-        Parser::for_weekday(Wed),
-        Parser::for_weekday(Thu),
-        Parser::for_weekday(Fri),
-        Parser::for_weekday(Sat),
-        Parser::for_weekday(Sun),
+        Parser::for_alias(today),
+        Parser::for_alias(today),
+        Parser::for_weekday(today, Mon),
+        Parser::for_weekday(today, Tue),
+        Parser::for_weekday(today, Wed),
+        Parser::for_weekday(today, Thu),
+        Parser::for_weekday(today, Fri),
+        Parser::for_weekday(today, Sat),
+        Parser::for_weekday(today, Sun),
     ];
 
     ALIASES
@@ -120,6 +129,7 @@ fn date_from_str(value: &str) -> Result<NaiveDate, std::io::Error> {
         .position(|&idx| idx == val)
         .map(|idx| &parsers[idx])
         .and_then(|parser| parser.parse(&val))
+        .map(to_string)
         .ok_or_else(|| {
             Error::new(
                 ErrorKind::InvalidInput,
@@ -130,68 +140,4 @@ fn date_from_str(value: &str) -> Result<NaiveDate, std::io::Error> {
                 ),
             )
         })
-}
-
-#[test]
-fn test_date_from_str() {
-    assert_eq!(
-        date_from_str("2023-02-08").ok(),
-        NaiveDate::from_ymd_opt(2023, 2, 8),
-    );
-    assert_eq!(
-        date_from_str("today").unwrap(),
-        NaiveDate::from_ymd_opt(2022, 12, 28).unwrap()
-    );
-    assert_eq!(
-        date_from_str("tomorrow").unwrap(),
-        NaiveDate::from_ymd_opt(2022, 12, 29).unwrap()
-    );
-    assert_eq!(
-        date_from_str("monday").ok(),
-        NaiveDate::from_ymd_opt(2023, 1, 2)
-    );
-    assert_eq!(
-        date_from_str("tuesday").ok(),
-        NaiveDate::from_ymd_opt(2023, 1, 3)
-    );
-    assert_eq!(
-        date_from_str("Wednesday").ok(),
-        NaiveDate::from_ymd_opt(2022, 12, 28)
-    );
-    assert_eq!(
-        date_from_str("thursday").ok(),
-        NaiveDate::from_ymd_opt(2022, 12, 29)
-    );
-    assert_eq!(
-        date_from_str("friday").ok(),
-        NaiveDate::from_ymd_opt(2022, 12, 30)
-    );
-    assert_eq!(
-        date_from_str("saturday").ok(),
-        NaiveDate::from_ymd_opt(2022, 12, 31)
-    );
-    assert!(date_from_str("ezz").is_err());
-    assert_eq!(
-        date_from_str("sunday").ok(),
-        NaiveDate::from_ymd_opt(2023, 1, 1)
-    );
-}
-
-pub fn parse_date(value: &str) -> Result<String, std::io::Error> {
-    date_from_str(value).map(|date| date.format(FORMAT).to_string())
-}
-
-#[test]
-fn test_parse_date() {
-    assert_eq!(parse_date("2023-02-08").unwrap(), "2023-02-08");
-    assert_eq!(parse_date("today").unwrap(), "2022-12-28");
-    assert_eq!(parse_date("tomorrow").unwrap(), "2022-12-29");
-    assert_eq!(parse_date("monday").unwrap(), "2023-01-02");
-    assert_eq!(parse_date("tuesday").unwrap(), "2023-01-03");
-    assert_eq!(parse_date("Wednesday").unwrap(), "2022-12-28");
-    assert_eq!(parse_date("thursday").unwrap(), "2022-12-29");
-    assert_eq!(parse_date("friday").unwrap(), "2022-12-30");
-    assert_eq!(parse_date("saturday").unwrap(), "2022-12-31");
-    assert_eq!(parse_date("sunday").unwrap(), "2023-01-01");
-    assert!(parse_date("ezz").is_err());
 }
