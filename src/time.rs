@@ -8,7 +8,7 @@ const FORMAT: &str = r"(?P<hour>\d{1,2})[:hH](?P<minute>\d{2})?";
 fn error(value: &str) -> Error {
     Error::new(
         ErrorKind::InvalidInput,
-        format!("Invalid time format: {}. Use {}", value, HUMAN_FORMAT,),
+        format!("Invalid time format: {value}. Use {HUMAN_FORMAT}",),
     )
 }
 
@@ -35,7 +35,7 @@ pub fn parse(value: &str) -> Result<String, std::io::Error> {
         Some(minute) => minute.as_str(),
         None => "00",
     };
-    let formatted = format!("{:0>2}:{:0>2}", hour, minute);
+    let formatted = format!("{hour:0>2}:{minute:0>2}");
     if !is_valid(&formatted) {
         return Err(error(value));
     }

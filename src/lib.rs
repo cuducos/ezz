@@ -56,7 +56,7 @@ impl Meeting {
             topic,
             password: password.unwrap_or_else(random_password),
             timezone,
-            start_time: format!("{}T{}:00", date, time),
+            start_time: format!("{date}T{time}:00"),
             duration,
             settings: MeetingSettings {
                 host_video: true,

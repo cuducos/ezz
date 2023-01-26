@@ -61,6 +61,6 @@ fn main() -> Result<(), ClientError> {
         args.duration,
     );
     let meeting_url = Zoom::new().and_then(|client| client.save(&meeting))?;
-    println!("{}", meeting_url);
+    println!("{meeting_url}");
     Ok(())
 }

@@ -39,14 +39,14 @@ pub enum ClientError {
 impl Display for ClientError {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            ClientError::MissingEnvVar(key) => write!(f, "Environment variable {} not found.", key),
-            ClientError::RequestError(e) => write!(f, "HTTP Request error: {}", e),
-            ClientError::ZoomError(msg) => write!(f, "Zoom API returned an error: {}", msg),
+            ClientError::MissingEnvVar(key) => write!(f, "Environment variable {key} not found."),
+            ClientError::RequestError(e) => write!(f, "HTTP Request error: {e}"),
+            ClientError::ZoomError(msg) => write!(f, "Zoom API returned an error: {msg}"),
             ClientError::SerializerError(e) => {
-                write!(f, "Error preparing data to send to Zoom API: {}", e)
+                write!(f, "Error preparing data to send to Zoom API: {e}")
             }
             ClientError::DeserializerError(e) => {
-                write!(f, "Error parsing response from Zoom API: {}", e)
+                write!(f, "Error parsing response from Zoom API: {e}")
             }
         }
     }
@@ -118,7 +118,7 @@ impl Zoom {
         let req = self
             .client
             .post(self.meeting_url.as_str())
-            .header("authorization", format!("Bearer {}", token))
+            .header("authorization", format!("Bearer {token}"))
             .header("content-type", "application/json")
             .body(body);
         let resp = self.send(req)?;
