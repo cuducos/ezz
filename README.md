@@ -4,6 +4,18 @@
 
 ## Install
 
+You can download the binary for your platform from the [releases page](https://github.com/cuducos/ezz/releases), for example:
+
+```console
+$ curl -LO https://github.com/cuducos/ezz/releases/download/v0.1.0/ezz-x86_64-unknown-linux-gnu.tar.gz
+$ tar -xzvf ezz-x86_64-unknown-linux-gnu.tar.gz
+$ rm ezz-x86_64-unknown-linux-gnu.tar.gz
+$ chmod a+x ezz
+$ mv ezz /usr/local/bin/
+```
+
+### Compile from source
+
 With [`cargo`](https://www.rust-lang.org/) installed:
 
 ```console
